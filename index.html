@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Fresh Start: side income ideas</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+  <select id="lang" class="chip" aria-label="Language"><option value="en">English</option><option value="hi">हिन्दी</option><option value="te">తెలుగు</option></select>
+  <h1>Fresh Start</h1>
+  <p class="lead">A business setback is not the end. Tell us what you enjoy and what you can spare, and we will suggest side-income ideas you can start small.</p>
+
+  <section id="form">
+    <div class="card">
+      <h2>What are you interested in?</h2>
+      <p class="hint">Pick as many as you like.</p>
+      <div class="chips" id="interests"></div>
+    </div>
+    <div class="card">
+      <h2>Your situation</h2>
+      <div class="row">
+        <div><label class="f" for="time">Hours per day you can give</label>
+          <select id="time" class="chip" style="width:100%"><option value="1">1 to 2 hours</option><option value="3" selected>3 to 4 hours</option><option value="6">5 or more hours</option></select></div>
+        <div><label class="f" for="money">Money you can invest to start</label>
+          <select id="money" class="chip" style="width:100%"><option value="0">Almost nothing</option><option value="1" selected>A small amount</option><option value="2">A moderate amount</option></select></div>
+        <div><label class="f" for="where">Where do you prefer to work?</label>
+          <select id="where" class="chip" style="width:100%"><option value="any" selected>No preference</option><option value="home">From home or online</option><option value="out">Out and about</option></select></div>
+        <div><label class="f" for="speed">How soon do you need income?</label>
+          <select id="speed" class="chip" style="width:100%"><option value="fast">Within weeks</option><option value="mid" selected>Within a few months</option><option value="slow">I can build slowly</option></select></div>
+      </div>
+    </div>
+    <button class="go" id="run" disabled>Show my ideas</button>
+    <p class="hint" id="pickmsg" style="margin-top:8px">Pick at least one interest to continue.</p>
+  </section>
+
+  <section id="results" class="hidden">
+    <div class="top" style="margin-bottom:12px"><h2>Ideas for you</h2><button class="ghost" id="back">Change answers</button></div>
+    <div id="list"></div>
+    <div class="note">Income varies a lot by place, effort, and skill, so treat these as starting points, not promises. Start with one idea, test it for two to four weeks, and keep your costs low. Avoid any scheme that asks you to pay a large fee up front.</div>
+  </section>
+</div>
+
+<script>
+// cost: 0 none, 1 small, 2 moderate. hours: minimum useful hours per day. where: home/out/any. speed: fast/mid/slow = how quickly money can come.
+var IDEAS=[
+{n:"Freelance writing or content",t:["writing","tech","creative"],c:0,h:1,w:"home",s:"mid",inc:"Low to medium",steps:["Pick one topic you know well from your business experience.","Write three sample pieces and put them in one shared document.","Create profiles on freelance sites and pitch 5 clients a day."]},
+{n:"Social media and small-business marketing",t:["marketing","creative","tech","business"],c:0,h:3,w:"home",s:"mid",inc:"Medium",steps:["Offer to manage posts for 2 local shops at a low starter price.","Show them simple before-and-after results after one month.","Raise prices and add clients as results come in."]},
+{n:"Online tutoring",t:["teaching","tech","writing","numbers"],c:0,h:1,w:"home",s:"fast",inc:"Low to medium",steps:["Choose a subject you are strong in, such as maths, English, or accounts.","List yourself on a tutoring platform and tell your network.","Start with a few students and collect reviews."]},
+{n:"Bookkeeping and accounts help for small shops",t:["numbers","business","teaching"],c:0,h:1,w:"any",s:"fast",inc:"Medium",steps:["Use your own business experience to offer monthly bookkeeping to 2 or 3 small businesses.","Learn a free tool such as a spreadsheet or basic accounting app.","Ask each happy client for a referral."]},
+{n:"Home-cooked food or tiffin service",t:["food"],c:1,h:3,w:"home",s:"fast",inc:"Medium",steps:["Start with 5 to 10 orders from neighbours and offices nearby.","Keep a short fixed menu so costs stay predictable.","Check local food licence rules before you grow."]},
+{n:"Baking or snack making",t:["food","creative"],c:1,h:3,w:"home",s:"mid",inc:"Low to medium",steps:["Choose 2 or 3 items you make really well.","Sell through friends, local groups, and messaging apps.","Take advance orders so you never waste stock."]},
+{n:"Delivery or ride driving",t:["driving","outdoors"],c:1,h:3,w:"out",s:"fast",inc:"Medium",steps:["Check what documents and vehicle the delivery or ride apps need.","Sign up with two apps and work at the busiest hours.","Track fuel and upkeep so you know your real profit."]},
+{n:"Resell products you can source cheaply",t:["business","marketing","outdoors"],c:2,h:3,w:"any",s:"mid",inc:"Medium",steps:["Pick one product type you already understand from your trade.","Buy a small batch, sell it online or at local markets, and measure profit.","Reinvest only what you earned, not more savings."]},
+{n:"Handmade crafts and gifts",t:["creative","crafts"],c:1,h:3,w:"home",s:"slow",inc:"Low to medium",steps:["Make a small set of 5 products and photograph them well.","Sell on a marketplace and through social media.","Take custom orders once you have a few reviews."]},
+{n:"Tailoring, alterations, or stitching",t:["crafts","creative"],c:1,h:3,w:"home",s:"fast",inc:"Medium",steps:["Offer alterations and repairs to your local area first.","Add simple custom orders for festivals and weddings.","Partner with a boutique for regular work."]},
+{n:"Graphic design and simple video editing",t:["creative","tech","marketing"],c:0,h:3,w:"home",s:"mid",inc:"Medium",steps:["Learn a free design tool and make 5 sample designs.","Offer logos, posters, and short videos to small businesses.","Build a simple portfolio page or shared folder."]},
+{n:"Web, app, or IT support for small businesses",t:["tech","business"],c:0,h:3,w:"home",s:"mid",inc:"Medium to high",steps:["Choose one service, such as simple websites or fixing computers.","Offer a low-price first project to get testimonials.","Move to monthly support plans."]},
+{n:"Event help, photography, or decoration",t:["creative","outdoors","crafts"],c:2,h:3,w:"out",s:"slow",inc:"Medium",steps:["Start by helping an experienced person to learn the work.","Build a portfolio from small family events.","Network with planners and venues for repeat work."]},
+{n:"Fitness, yoga, or wellness coaching",t:["fitness","teaching"],c:0,h:1,w:"any",s:"mid",inc:"Low to medium",steps:["Start with small group classes in a park or online.","Hold a free first session to build trust.","Move to monthly memberships."]},
+{n:"Business advice for new owners",t:["business","teaching","numbers","writing"],c:0,h:1,w:"home",s:"slow",inc:"Medium to high",steps:["Your setback is real experience. Write down what you learned.","Share it as posts or short talks for new entrepreneurs.","Offer paid one-to-one sessions or small workshops."]},
+{n:"Gardening, plants, and nursery",t:["outdoors","crafts"],c:1,h:3,w:"home",s:"slow",inc:"Low to medium",steps:["Start with easy-growing plants and small pots.","Sell locally and through apartment communities.","Offer garden setup services to add income."]},
+{n:"Data entry and virtual assistant work",t:["tech","numbers","writing"],c:0,h:3,w:"home",s:"fast",inc:"Low",steps:["List the tasks you can do, such as email, spreadsheets, and scheduling.","Apply on freelance sites with a short clear profile.","Move up to higher-paid assistant roles over time."]}
+];
+var INTERESTS=[["business","Business and trading"],["numbers","Numbers and accounts"],["food","Food and cooking"],["creative","Design and creativity"],["crafts","Crafts and stitching"],["tech","Computers and tech"],["writing","Writing"],["teaching","Teaching"],["marketing","Selling and marketing"],["driving","Driving"],["outdoors","Outdoor work"],["fitness","Fitness and wellness"]];
+var picked={};
+var box=document.getElementById("interests");
+INTERESTS.forEach(function(p){
+  var b=document.createElement("button");b.type="button";b.className="chip";b.textContent=p[1];b.dataset.k=p[0];b.setAttribute("aria-pressed","false");
+  b.onclick=function(){picked[p[0]]=!picked[p[0]];b.setAttribute("aria-pressed",String(!!picked[p[0]]));update()};
+  box.appendChild(b);
+});
+function count(){return Object.keys(picked).filter(function(k){return picked[k]}).length}
+function update(){var ok=count()>0;document.getElementById("run").disabled=!ok;document.getElementById("pickmsg").style.display=ok?"none":"block"}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function score(i,o){
+  var hits=i.t.filter(function(x){return picked[x]}).length;
+  var s=hits*30;
+  if(i.c<=o.money)s+=20;else s-=25*(i.c-o.money);
+  if(i.h<=o.time)s+=15;else s-=15;
+  if(o.where==="any"||i.w==="any"||i.w===o.where)s+=10;else s-=10;
+  var order={fast:0,mid:1,slow:2};
+  if(order[i.s]<=order[o.speed])s+=15;else s-=15;
+  return {s:s,hits:hits};
+}
+var costTxt=["No cost or very low","Small starting cost","Moderate starting cost"];
+var spdTxt={fast:"Can earn within weeks",mid:"Takes a few months",slow:"Builds slowly"};
+function run(){var L=T[lang];
+  var o={time:+document.getElementById("time").value,money:+document.getElementById("money").value,where:document.getElementById("where").value,speed:document.getElementById("speed").value};
+  var r=IDEAS.map(function(i){var x=score(i,o);return {i:i,s:x.s,hits:x.hits}}).filter(function(x){return x.hits>0}).sort(function(a,b){return b.s-a.s}).slice(0,5);
+  var list=document.getElementById("list");list.innerHTML="";
+  if(!r.length){list.innerHTML='<div class="card">'+L.nomatch+'</div>'}
+  r.forEach(function(x){
+    var pct=Math.max(35,Math.min(98,Math.round(40+x.s*0.6)));
+    var warn=x.i.c>o.money?'<div class="note warn">'+L.warn+'</div>':"";
+    var d=document.createElement("div");d.className="card idea";
+    d.innerHTML='<div class="top"><h2>'+esc((L.names&&L.names[IDEAS.indexOf(x.i)])||x.i.n)+'</h2><span class="match">'+pct+L.match+'</span></div>'+
+    '<div class="bar"><i style="--p:'+pct+'%"></i></div>'+
+    '<div class="meta"><span><b>'+L.income+'</b> '+esc((L.inc&&L.inc[x.i.inc])||x.i.inc)+'</span><span><b>'+L.cost+'</b> '+costTxt[x.i.c]+'</span><span><b>'+L.speedl+'</b> '+spdTxt[x.i.s]+'</span></div>'+
+    '<b>'+L.how+'</b><ol>'+x.i.steps.map(function(s){return "<li>"+esc(s)+"</li>"}).join("")+"</ol>"+warn+findHtml(IDEAS.indexOf(x.i));
+    list.appendChild(d);
+  });
+  document.getElementById("form").classList.add("hidden");
+  document.getElementById("results").classList.remove("hidden");
+  window.scrollTo(0,0);
+}
+document.getElementById("run").onclick=run;
+document.getElementById("back").onclick=function(){document.getElementById("results").classList.add("hidden");document.getElementById("form").classList.remove("hidden")};
+var lang="en";
+var T={
+en:{title:"Fresh Start: side income ideas",lead:"A business setback is not the end. Tell us what you enjoy and what you can spare, and we will suggest side-income ideas you can start small.",h_int:"What are you interested in?",hint_int:"Pick as many as you like.",h_sit:"Your situation",time:"Hours per day you can give",money:"Money you can invest to start",where:"Where do you prefer to work?",speed:"How soon do you need income?",o_time:["1 to 2 hours","3 to 4 hours","5 or more hours"],o_money:["Almost nothing","A small amount","A moderate amount"],o_where:["No preference","From home or online","Out and about"],o_speed:["Within weeks","Within a few months","I can build slowly"],go:"Show my ideas",pick:"Pick at least one interest to continue.",h_res:"Ideas for you",back:"Change answers",note:"Income varies a lot by place, effort, and skill, so treat these as starting points, not promises. Start with one idea, test it for two to four weeks, and keep your costs low. Avoid any scheme that asks you to pay a large fee up front.",how:"How to start",income:"Income:",cost:"Cost:",speedl:"Speed:",match:"% match",warn:"This needs more money than you chose. Start with the smallest version, or save a little first.",nomatch:"No match yet. Try picking more interests.",costs:costTxt,spd:spdTxt,names:null,inc:null,int:{business:"Business and trading",numbers:"Numbers and accounts",food:"Food and cooking",creative:"Design and creativity",crafts:"Crafts and stitching",tech:"Computers and tech",writing:"Writing",teaching:"Teaching",marketing:"Selling and marketing",driving:"Driving",outdoors:"Outdoor work",fitness:"Fitness and wellness"}},
+hi:{title:"फ्रेश स्टार्ट: अतिरिक्त आय के विचार",lead:"व्यापार में नुकसान होना अंत नहीं है। बताइए आपको क्या पसंद है और आप कितना समय व पैसा लगा सकते हैं, हम छोटे स्तर से शुरू होने वाले अतिरिक्त आय के सुझाव देंगे।",h_int:"आपकी रुचि किसमें है?",hint_int:"जितने चाहें चुनें।",h_sit:"आपकी स्थिति",time:"रोज़ कितने घंटे दे सकते हैं",money:"शुरू करने के लिए कितना पैसा लगा सकते हैं",where:"आप कहाँ काम करना पसंद करेंगे?",speed:"आय कितनी जल्दी चाहिए?",o_time:["1 से 2 घंटे","3 से 4 घंटे","5 या अधिक घंटे"],o_money:["लगभग कुछ नहीं","थोड़ी रकम","मध्यम रकम"],o_where:["कोई पसंद नहीं","घर से या ऑनलाइन","बाहर जाकर"],o_speed:["कुछ हफ्तों में","कुछ महीनों में","मैं धीरे-धीरे बना सकता/सकती हूँ"],go:"मेरे सुझाव दिखाएँ",pick:"आगे बढ़ने के लिए कम से कम एक रुचि चुनें।",h_res:"आपके लिए सुझाव",back:"जवाब बदलें",note:"आय जगह, मेहनत और कौशल के अनुसार बहुत बदलती है, इसलिए इन्हें शुरुआती बिंदु मानें, वादा नहीं। एक विचार चुनें, 2 से 4 हफ्ते आज़माएँ और खर्च कम रखें। जो योजना पहले से बड़ी फीस माँगे, उससे बचें। अभी शुरुआत के चरण अंग्रेज़ी में दिखते हैं।",how:"शुरू कैसे करें",income:"आय:",cost:"लागत:",speedl:"गति:",match:"% मेल",warn:"इसके लिए आपके चुने बजट से ज़्यादा पैसा चाहिए। सबसे छोटे रूप से शुरू करें, या पहले थोड़ी बचत करें।",nomatch:"अभी कोई मेल नहीं मिला। और रुचियाँ चुनकर देखें।",costs:["कोई या बहुत कम लागत","थोड़ी शुरुआती लागत","मध्यम शुरुआती लागत"],spd:{fast:"कुछ हफ्तों में कमाई संभव",mid:"कुछ महीने लगते हैं",slow:"धीरे-धीरे बढ़ता है"},inc:{"Low":"कम","Low to medium":"कम से मध्यम","Medium":"मध्यम","Medium to high":"मध्यम से अधिक"},int:{business:"व्यापार और ट्रेडिंग",numbers:"हिसाब-किताब",food:"खाना बनाना",creative:"डिज़ाइन और रचनात्मकता",crafts:"हस्तशिल्प और सिलाई",tech:"कंप्यूटर और तकनीक",writing:"लेखन",teaching:"पढ़ाना",marketing:"बिक्री और मार्केटिंग",driving:"ड्राइविंग",outdoors:"बाहर का काम",fitness:"फिटनेस और वेलनेस"},names:["फ्रीलांस लेखन या कंटेंट","सोशल मीडिया और छोटे व्यापार की मार्केटिंग","ऑनलाइन ट्यूशन","छोटी दुकानों के लिए बहीखाता और हिसाब","घर का बना खाना या टिफ़िन सेवा","बेकिंग या स्नैक्स बनाना","डिलीवरी या राइड ड्राइविंग","सस्ते में मिलने वाला सामान दोबारा बेचना","हाथ से बने शिल्प और गिफ्ट","सिलाई, अल्टरेशन या स्टिचिंग","ग्राफ़िक डिज़ाइन और सरल वीडियो एडिटिंग","छोटे व्यापारों के लिए वेबसाइट, ऐप या आईटी सपोर्ट","इवेंट में मदद, फ़ोटोग्राफ़ी या सजावट","फिटनेस, योग या वेलनेस कोचिंग","नए उद्यमियों के लिए व्यापार सलाह","बागवानी, पौधे और नर्सरी","डेटा एंट्री और वर्चुअल असिस्टेंट"]},
+te:{title:"ఫ్రెష్ స్టార్ట్: అదనపు ఆదాయ ఆలోచనలు",lead:"వ్యాపారంలో నష్టం వచ్చినా అది ముగింపు కాదు. మీకు ఏది ఇష్టమో, ఎంత సమయం, డబ్బు పెట్టగలరో చెప్పండి. చిన్నగా మొదలుపెట్టగల అదనపు ఆదాయ ఆలోచనలు సూచిస్తాం.",h_int:"మీకు దేనిపై ఆసక్తి ఉంది?",hint_int:"మీకు నచ్చినన్ని ఎంచుకోండి.",h_sit:"మీ పరిస్థితి",time:"రోజుకు ఎన్ని గంటలు కేటాయించగలరు",money:"మొదలుపెట్టడానికి ఎంత డబ్బు పెట్టగలరు",where:"ఎక్కడ పని చేయడానికి ఇష్టపడతారు?",speed:"ఆదాయం ఎంత త్వరగా కావాలి?",o_time:["1 నుండి 2 గంటలు","3 నుండి 4 గంటలు","5 లేదా ఎక్కువ గంటలు"],o_money:["దాదాపు ఏమీ లేదు","కొద్ది మొత్తం","మధ్యస్థ మొత్తం"],o_where:["ప్రత్యేక ఇష్టం లేదు","ఇంటి నుండి లేదా ఆన్‌లైన్","బయట తిరిగి"],o_speed:["కొన్ని వారాల్లో","కొన్ని నెలల్లో","నెమ్మదిగా పెంచుకోగలను"],go:"నా సూచనలు చూపించు",pick:"కొనసాగడానికి కనీసం ఒక ఆసక్తిని ఎంచుకోండి.",h_res:"మీ కోసం సూచనలు",back:"సమాధానాలు మార్చు",note:"ఆదాయం ప్రాంతం, శ్రమ, నైపుణ్యాన్ని బట్టి చాలా మారుతుంది, కాబట్టి ఇవి ప్రారంభ సూచనలు మాత్రమే, హామీలు కాదు. ఒక ఆలోచనను ఎంచుకుని 2 నుండి 4 వారాలు ప్రయత్నించండి, ఖర్చు తక్కువగా ఉంచండి. ముందే పెద్ద ఫీజు అడిగే పథకాలకు దూరంగా ఉండండి. ప్రస్తుతం ప్రారంభ దశలు ఇంగ్లీషులో ఉన్నాయి.",how:"ఎలా మొదలుపెట్టాలి",income:"ఆదాయం:",cost:"ఖర్చు:",speedl:"వేగం:",match:"% సరిపోలిక",warn:"దీనికి మీరు ఎంచుకున్న బడ్జెట్ కంటే ఎక్కువ డబ్బు కావాలి. అతి చిన్న రూపంలో మొదలుపెట్టండి, లేదా ముందు కొంత పొదుపు చేయండి.",nomatch:"ఇంకా సరిపోలేదు. మరిన్ని ఆసక్తులు ఎంచుకోండి.",costs:["ఖర్చు లేదు లేదా చాలా తక్కువ","చిన్న ప్రారంభ ఖర్చు","మధ్యస్థ ప్రారంభ ఖర్చు"],spd:{fast:"కొన్ని వారాల్లో సంపాదన సాధ్యం",mid:"కొన్ని నెలలు పడుతుంది",slow:"నెమ్మదిగా పెరుగుతుంది"},inc:{"Low":"తక్కువ","Low to medium":"తక్కువ నుండి మధ్యస్థం","Medium":"మధ్యస్థం","Medium to high":"మధ్యస్థం నుండి ఎక్కువ"},int:{business:"వ్యాపారం, ట్రేడింగ్",numbers:"లెక్కలు, అకౌంట్స్",food:"వంట",creative:"డిజైన్, సృజనాత్మకత",crafts:"హస్తకళలు, కుట్టు",tech:"కంప్యూటర్లు, టెక్",writing:"రచన",teaching:"బోధన",marketing:"అమ్మకాలు, మార్కెటింగ్",driving:"డ్రైవింగ్",outdoors:"బయటి పని",fitness:"ఫిట్‌నెస్, వెల్‌నెస్"},names:["ఫ్రీలాన్స్ రచన లేదా కంటెంట్","సోషల్ మీడియా, చిన్న వ్యాపారాల మార్కెటింగ్","ఆన్‌లైన్ ట్యూషన్","చిన్న దుకాణాలకు బుక్‌కీపింగ్, లెక్కల సహాయం","ఇంట్లో వండిన ఆహారం లేదా టిఫిన్ సేవ","బేకింగ్ లేదా స్నాక్స్ తయారీ","డెలివరీ లేదా రైడ్ డ్రైవింగ్","తక్కువ ధరకు దొరికే వస్తువులను తిరిగి అమ్మడం","చేతితో చేసిన హస్తకళలు, బహుమతులు","కుట్టు, ఆల్టరేషన్లు","గ్రాఫిక్ డిజైన్, సులభమైన వీడియో ఎడిటింగ్","చిన్న వ్యాపారాలకు వెబ్, యాప్, ఐటీ సపోర్ట్","ఈవెంట్ సహాయం, ఫోటోగ్రఫీ, అలంకరణ","ఫిట్‌నెస్, యోగా, వెల్‌నెస్ కోచింగ్","కొత్త వ్యాపారులకు వ్యాపార సలహా","తోటపని, మొక్కలు, నర్సరీ","డేటా ఎంట్రీ, వర్చువల్ అసిస్టెంట్"]}
+};
+function apply(){var L=T[lang];
+ document.documentElement.lang=lang;document.title=L.title;
+ document.querySelector(".lead").textContent=L.lead;
+ var h=document.querySelectorAll("#form h2");h[0].textContent=L.h_int;h[1].textContent=L.h_sit;
+ document.querySelector("#form .hint").textContent=L.hint_int;
+ ["time","money","where","speed"].forEach(function(k){
+  document.querySelector('label[for="'+k+'"]').textContent=L[k];
+  var op=document.getElementById(k).options;for(var j=0;j<op.length;j++)op[j].textContent=L["o_"+k][j];});
+ document.getElementById("run").textContent=L.go;
+ document.getElementById("pickmsg").textContent=L.pick;
+ document.querySelector("#results h2").textContent=L.h_res;
+ document.getElementById("back").textContent=L.back;
+ document.querySelector("#results > .note").textContent=L.note;
+ document.querySelectorAll("#interests .chip").forEach(function(b){b.textContent=L.int[b.dataset.k]});
+ costTxt=L.costs;spdTxt=L.spd;
+ if(!document.getElementById("results").classList.contains("hidden"))run();
+}
+var SITES={naukri:["Naukri",function(k){return "https://www.naukri.com/"+k.replace(/ /g,"-")+"-jobs"}],indeed:["Indeed",function(k){return "https://in.indeed.com/jobs?q="+encodeURIComponent(k)}],linkedin:["LinkedIn",function(k){return "https://www.linkedin.com/jobs/search/?keywords="+encodeURIComponent(k)+"&location=India"}],upwork:["Upwork",function(k){return "https://www.upwork.com/nx/search/jobs/?q="+encodeURIComponent(k)}],fiverr:["Fiverr",function(k){return "https://www.fiverr.com/search/gigs?query="+encodeURIComponent(k)}],google:["Google",function(k){return "https://www.google.com/search?q="+encodeURIComponent(k+" jobs near me")}]};
+var SETS={job:["naukri","indeed","linkedin"],free:["upwork","fiverr","linkedin"],local:["google","indeed","naukri"]};
+var FIND=[["content writer","free"],["social media manager","free"],["online tutor","job"],["bookkeeper","free"],["cook","local"],["baker","local"],["delivery partner","local"],["reseller","local"],["handicraft","local"],["tailor","local"],["graphic designer","free"],["web developer","free"],["event assistant","local"],["yoga instructor","job"],["business consultant","free"],["gardener","local"],["data entry","free"]];
+var FIND_T={en:{h:"Find work or clients",s:"Links open other websites. Never pay money to get a job."},hi:{h:"काम या ग्राहक खोजें",s:"लिंक दूसरी वेबसाइट खोलते हैं। नौकरी पाने के लिए कभी पैसे न दें।"},te:{h:"పని లేదా కస్టమర్లను వెతకండి",s:"లింకులు ఇతర వెబ్‌సైట్లను తెరుస్తాయి. ఉద్యోగం కోసం ఎప్పుడూ డబ్బు చెల్లించకండి."}};
+function findHtml(i){var f=FIND[i],S=FIND_T[lang];if(!f)return "";
+ return '<b style="display:block;margin-top:14px">'+S.h+'</b><div class="links">'+SETS[f[1]].map(function(id){var s=SITES[id];return '<a href="'+s[1](f[0])+'" target="_blank" rel="noopener noreferrer">'+s[0]+'</a>'}).join("")+'</div><p class="hint" style="margin:8px 0 0">'+S.s+'</p>'}
+document.getElementById("lang").onchange=function(){lang=this.value;apply()};
+update();
+</script>
+</body>
+</html>
